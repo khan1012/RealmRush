@@ -11,9 +11,12 @@ public class CooredinateLabeler : MonoBehaviour
 
     TMP_Text label;
     Vector2Int coordinates = new Vector2Int();
+    Waypoint waypoint;
     void Awake()
     {
+        waypoint = GetComponentInParent<Waypoint>();
         label = GetComponent<TMP_Text>();
+        label.enabled = false;
         DisplayCoordinates();
     }
 
@@ -23,6 +26,29 @@ public class CooredinateLabeler : MonoBehaviour
         {
             DisplayCoordinates();
             UpdateObjectName();
+        }
+
+        ColorCoordinates();
+        ToggleCoordinateVisibility();
+    }
+
+    void ToggleCoordinateVisibility()
+    {
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            label.enabled = !label.IsActive();
+        }
+    }
+
+    void ColorCoordinates()
+    {
+        if (waypoint.IsPlaceable)
+        {
+            label.color = Color.white;
+        }
+        else
+        {
+            label.color = Color.gray;
         }
     }
 
