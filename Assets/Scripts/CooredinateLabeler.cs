@@ -5,17 +5,18 @@ using UnityEngine;
 using TMPro;
 using UnityEditor.SceneManagement;
 
+[RequireComponent(typeof(TextMeshPro))]
 [ExecuteAlways]
 public class CooredinateLabeler : MonoBehaviour
 {
 
-    TMP_Text label;
+    TextMeshPro label;
     Vector2Int coordinates = new Vector2Int();
     Waypoint waypoint;
     void Awake()
     {
         waypoint = GetComponentInParent<Waypoint>();
-        label = GetComponent<TMP_Text>();
+        label = GetComponent<TextMeshPro>();
         label.enabled = false;
         DisplayCoordinates();
     }
@@ -28,7 +29,7 @@ public class CooredinateLabeler : MonoBehaviour
             UpdateObjectName();
         }
 
-        ColorCoordinates();
+        SetLabelColor();
         ToggleCoordinateVisibility();
     }
 
@@ -40,7 +41,7 @@ public class CooredinateLabeler : MonoBehaviour
         }
     }
 
-    void ColorCoordinates()
+    void SetLabelColor()
     {
         if (waypoint.IsPlaceable)
         {
