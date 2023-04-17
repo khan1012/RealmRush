@@ -5,49 +5,53 @@ using UnityEngine;
 [RequireComponent(typeof(Enemy))]
 public class EnemyMover : MonoBehaviour
 {
-    [SerializeField] List<Waypoint> path = new List<Waypoint>();
     [SerializeField][Range(0f, 5f)] float speed = 1f;
-
+    List<Node> path = new List<Node>();
     Enemy enemy;
-    // Start is called before the first frame update
+    GridManager gridManager;
+    PathFinder pathFinder;
     void OnEnable()
     {
-        FindPath();
         ReturnToStart();
-        StartCoroutine(FollowPath());
+        ReCalculatePath(true);
     }
 
-    void Start()
+    void Awake()
     {
+        gridManager = FindObjectOfType<GridManager>();
+        pathFinder = FindObjectOfType<PathFinder>();
         enemy = GetComponent<Enemy>();
     }
 
-    void FindPath()
+    void ReCalculatePath(bool resetPath)
     {
-        path.Clear();
-        GameObject parent = GameObject.FindGameObjectWithTag("Path");
-        foreach (Transform child in parent.transform)
+        Vector2Int coordinates = new Vector2Int();
+        if (resetPath)
         {
-            Waypoint waypoint = child.GetComponent<Waypoint>();
-            if (waypoint != null)
-            {
-                path.Add(waypoint);
-            }
+            coordinates = pathFinder.StartCoordinates;
         }
+        else
+        {
+            coordinates = gridManager.GetCoordinatesFromPosition(transform.position);
+        }
+
+        StopAllCoroutines();
+        path.Clear();
+        path = pathFinder.GetNewPath(coordinates);
+        StartCoroutine(FollowPath());
     }
 
     void ReturnToStart()
     {
-        transform.position = path[0].transform.position;
+        transform.position = gridManager.GetPositionFromCoordinates(pathFinder.StartCoordinates);
     }
 
-    // Update is called once per frame
     IEnumerator FollowPath()
     {
-        foreach (var waypoint in path)
+        for (int i = 1; i < path.Count; i++)
         {
             Vector3 startPosition = transform.position;
-            Vector3 targetPosition = waypoint.transform.position;
+            Vector3 targetPosition = gridManager.GetPositionFromCoordinates(path[i].coordinates);
             float travelPercent = 0f;
 
             transform.LookAt(targetPosition);
@@ -65,8 +69,11 @@ public class EnemyMover : MonoBehaviour
 
     void FinishPath()
     {
-        enemy.StealGold();
-        gameObject.SetActive(false);
+        if (enemy != null)
+        {
+            enemy.StealGold();
+            gameObject.SetActive(false);
+        }
     }
 
 }

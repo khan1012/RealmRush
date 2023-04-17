@@ -7,9 +7,8 @@ public class EnemyHealth : MonoBehaviour
     [Tooltip("Increase max hit points by this amount when enemy dies")]
     [SerializeField] int difficultyRamp = 1;
     int currentHitPoints = 0;
-
     Enemy enemy;
-    // Start is called before the first frame update
+
     void OnEnable()
     {
         currentHitPoints = maxHitPoints;
